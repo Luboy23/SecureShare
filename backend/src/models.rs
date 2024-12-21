@@ -25,7 +25,7 @@ pub struct File {
     pub user_id: Option<uuid::Uuid>,       // 文件所属用户的唯一标识符 (UUID)，可能为空
     pub file_name: String,                 // 文件名
     pub file_size: i64,                    // 文件大小 (字节数)
-    pub encrypted_ase_key: Vec<u8>,        // 加密后的 AES 密钥
+    pub encrypted_aes_key: Vec<u8>,        // 加密后的 AES 密钥
     pub encrypted_file: Vec<u8>,           // 加密后的文件数据
     pub iv: Vec<u8>,                       // 初始化向量 (IV) 用于加密解密
     pub created_at: Option<DateTime<Utc>>,  // 文件上传时间，可能为空
@@ -33,7 +33,7 @@ pub struct File {
 
 // 文件分享链接数据结构，包含了分享链接的基本信息
 #[derive(Debug, Clone, Deserialize, Serialize, sqlx::FromRow, sqlx::Type)] // 派生 Debug, Clone, Deserialize, Serialize, sqlx::FromRow 和 sqlx::Type
-pub struct ShareLink {
+pub struct SharedLink {
     pub id: uuid::Uuid,                    // 分享链接唯一标识符 (UUID)
     pub file_id: Option<uuid::Uuid>,       // 被分享文件的唯一标识符 (UUID)，可能为空
     pub recipient_user_id: Option<uuid::Uuid>, // 接收者的用户标识符 (UUID)，可能为空

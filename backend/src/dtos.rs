@@ -78,40 +78,31 @@ pub struct FilterUserDto {
     pub updated_at: DateTime<Utc>, // 用户更新时间
 }
 
-impl FilterUserDto {
-    pub fn filter_user(user: &User) -> Self {
-        FilterUserDto {
-            id: user.id.to_string(),
-            name: user.name.to_owned(),
-            email: user.email.to_owned(),
-            public_key: user.public_key.to_owned(),
-            created_at: user.created_at.unwrap(),
-            updated_at: user.updated_at.unwrap(),
-        }
-    }
-}
-
+// 用于描述用户数据的结构体
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserData {
-    pub user: FilterUserDto,
+    pub user: FilterUserDto, // 用户信息，使用 FilterUserDto 进行数据过滤
 }
 
+// 用户响应数据的结构体
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserResponseDto {
-    pub status: String,
-    pub data: UserData,
+    pub status: String, // 请求状态
+    pub data: UserData,  // 用户数据
 }
 
+// 用户发送文件的 DTO（数据传输对象）
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserSendFileDto {
-    pub file_id: String,
-    pub file_name: String,
-    pub recipient_email: String,
-    pub expiration_date: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
+    pub file_id: String, // 文件 ID
+    pub file_name: String, // 文件名称
+    pub recipient_email: String, // 接收者的邮箱
+    pub expiration_date: DateTime<Utc>, // 文件过期时间
+    pub created_at: DateTime<Utc>, // 文件创建时间
 }
 
 impl UserSendFileDto {
+    // 用于过滤和构造 UserSendFileDto 的方法
     pub fn filter_send_user_file(file_data: &SendFileDetails) -> Self {
         UserSendFileDto {
             file_id: file_data.file_id.to_string(),
@@ -122,29 +113,32 @@ impl UserSendFileDto {
         }
     }
 
+    // 用于处理多个文件数据并返回 UserSendFileDto 列表的静态方法
     pub fn filter_send_user_files(user: &[SendFileDetails]) -> Vec<UserSendFileDto> {
         user.iter().map(UserSendFileDto::filter_send_user_file).collect()
     }
 }
 
-
+// 用户发送文件列表响应 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserSendFileListResponseDto {
-    pub status: String,
-    pub files: Vec<UserSendFileDto>,
-    pub results: i64,
+    pub status: String, // 响应状态
+    pub files: Vec<UserSendFileDto>, // 文件列表
+    pub results: i64, // 返回结果的总数
 }
 
+// 用户接收文件的 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserReceiveFileDto {
-    pub file_id: String,
-    pub file_name: String,
-    pub sender_email: String,
-    pub expiration_date: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
+    pub file_id: String, // 文件 ID
+    pub file_name: String, // 文件名称
+    pub sender_email: String, // 发送者邮箱
+    pub expiration_date: DateTime<Utc>, // 文件过期时间
+    pub created_at: DateTime<Utc>, // 文件创建时间
 }
 
 impl UserReceiveFileDto {
+    // 用于过滤和构造 UserReceiveFileDto 的方法
     pub fn filter_receive_user_file(file_data: &ReceiveFileDetails) -> Self {
         UserReceiveFileDto {
             file_id: file_data.file_id.to_string(),
@@ -155,110 +149,123 @@ impl UserReceiveFileDto {
         }
     }
 
+    // 用于处理多个文件数据并返回 UserReceiveFileDto 列表的静态方法
     pub fn filter_receive_user_files(user: &[ReceiveFileDetails]) -> Vec<UserReceiveFileDto> {
         user.iter().map(UserReceiveFileDto::filter_receive_user_file).collect()
     }
 }
 
-
+// 用户接收文件列表响应 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserReceiveFileListResponseDto {
-    pub status: String,
-    pub files: Vec<UserReceiveFileDto>,
-    pub results: i64,
+    pub status: String, // 响应状态
+    pub files: Vec<UserReceiveFileDto>, // 文件列表
+    pub results: i64, // 返回结果的总数
 }
 
+// 用户登录响应的 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserLoginResponseDto {
-    pub status: String,
-    pub token: String,
+    pub status: String, // 登录状态
+    pub token: String,  // 用户的认证 token
 }
 
+// 通用响应 DTO
 #[derive(Serialize, Deserialize)]
 pub struct Response {
-    pub status: &'static str,
-    pub message: String,
+    pub status: &'static str, // 响应状态
+    pub message: String,      // 响应消息
 }
 
+// 更新用户名的 DTO
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct NameUpdateDto {
-    #[validate(length(min = 1, message = "Name is required"))]
-    pub name: String,
+    #[validate(length(min = 1, message = "Name is required"))] // 校验名称不能为空
+    pub name: String, // 新的用户名
 }
 
+// 更新用户密码的 DTO
 #[derive(Debug, Validate, Default, Clone, Serialize, Deserialize)]
 pub struct UserPasswordUpdateDto {
     #[validate(
-        length(min = 1, message = "New password is required."),
-        length(min = 6, message = "new password must be at least 6 characters")
+        length(min = 1, message = "New password is required."), // 校验新密码不能为空
+        length(min = 6, message = "new password must be at least 6 characters") // 新密码至少 6 位
     )]
-    pub new_password: String,
+    pub new_password: String, // 新密码
 
     #[validate(
-        length(min = 1, message = "New password confirm is required."),
-        length(min = 6, message = "new password confirm must be at least 6 characters"),
-        must_match(other = "new_password", message="new passwords do not match")
+        length(min = 1, message = "New password confirm is required."), // 校验确认新密码不能为空
+        length(min = 6, message = "new password confirm must be at least 6 characters"), // 确认密码至少 6 位
+        must_match(other = "new_password", message="new passwords do not match") // 确认密码和新密码必须匹配
     )]
-    pub new_password_confirm: String,
+    pub new_password_confirm: String, // 确认新密码
 
     #[validate(
-        length(min = 1, message = "Old password is required."),
-        length(min = 6, message = "Old password must be at least 6 characters")
+        length(min = 1, message = "Old password is required."), // 校验旧密码不能为空
+        length(min = 6, message = "Old password must be at least 6 characters") // 旧密码至少 6 位
     )]
-    pub old_password: String,
+    pub old_password: String, // 旧密码
 }
 
+// 通过电子邮件查询用户的 DTO
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct SearchQueryByEmailDTO {
-    #[validate(length(min = 1, message = "Query is requireed"))]
-    pub query: String,
+    #[validate(length(min = 1, message = "Query is required"))] // 校验查询条件不能为空
+    pub query: String, // 查询条件（电子邮件）
 }
 
+// 用于过滤用户邮箱的 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FilterEmailDto {
-    pub email: String,
+    pub email: String, // 用户的邮箱
 }
 
 impl FilterEmailDto {
+    // 过滤单个用户的邮箱
     pub fn filter_email(user: &User) -> Self {
         FilterEmailDto {
             email: user.email.to_owned(),
         }
     }
 
+    // 过滤多个用户的邮箱
     pub fn filter_emails(user: &[User]) -> Vec<FilterEmailDto> {
         user.iter().map(FilterEmailDto::filter_email).collect()
     }
 }
 
+// 返回用户邮箱列表的响应 DTO
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EmailListResponseDto {
-    pub status: String,
-    pub emails: Vec<FilterEmailDto>,
+    pub status: String, // 响应状态
+    pub emails: Vec<FilterEmailDto>, // 用户邮箱列表
 }
 
+// 文件上传 DTO
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct FileUploadDtos {
-    #[validate(email(message = "Invalid email format"))]
-    pub recipient_email: String,
+    #[validate(email(message = "Invalid email format"))] // 校验邮箱格式是否合法
+    pub recipient_email: String, // 接收者的邮箱
 
     #[validate(
-        length(min = 1, message = "New password is required."),
-        length(min = 6, message = "New password must be at least 6 characters")
+        length(min = 1, message = "New password is required."), // 校验新密码不能为空
+        length(min = 6, message = "New password must be at least 6 characters") // 新密码至少 6 位
     )]
-    pub password: String,
+    pub password: String, // 文件加密密码
 
-    #[validate(custom = "validate_expiration_date")]
-    pub expiration_date: String,
+    #[validate(custom = "validate_expiration_date")] // 自定义的过期日期验证
+    pub expiration_date: String, // 文件过期日期
 }
 
+// 自定义的过期日期验证函数
 fn validate_expiration_date(expiration_date: &str) -> Result<(), ValidationError> {
-    if expiration_date.is_empty() {
+    if expiration_date.is_empty() { // 如果过期日期为空，返回错误
         let mut error = ValidationError::new("expiration_date_required");
         error.message = Some("Expiration date is required.".into());
         return Err(error);
     }
 
+    // 解析过期日期
     let parsed_date = DateTime::parse_from_rfc3339(expiration_date)
     .map_err(|_| {
         let mut error = ValidationError::new("invalid_date_format");
@@ -266,9 +273,10 @@ fn validate_expiration_date(expiration_date: &str) -> Result<(), ValidationError
         error
     })?;
 
+    // 获取当前时间并校验过期时间是否大于当前时间
     let now = Utc::now();
 
-    if parsed_date <= now {
+    if parsed_date <= now { // 如果过期时间小于或等于当前时间，返回错误
         let mut error = ValidationError::new("expiration_date_future");
         error.message = Some("Expiration date must be in the future.".into());
         return Err(error);
@@ -277,14 +285,15 @@ fn validate_expiration_date(expiration_date: &str) -> Result<(), ValidationError
     Ok(())
 }
 
+// 用于文件检索的 DTO
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct RetrieveFileDto {
-    #[validate(length(min = 1, message = "Shared id is required"))]
-    pub shared_id: String,
+    #[validate(length(min = 1, message = "Shared id is required"))] // 校验共享 ID 必须存在
+    pub shared_id: String, // 共享 ID
 
     #[validate(
-        length(min = 1, message = "Password is required."),
-        length(min = 6, message = "Password must be at least 6 characters")
+        length(min = 1, message = "Password is required."), // 校验密码不能为空
+        length(min = 6, message = "Password must be at least 6 characters") // 密码至少 6 位
     )]
-    pub password: String,
+    pub password: String, // 密码
 }
